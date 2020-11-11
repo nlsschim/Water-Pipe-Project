@@ -1,5 +1,6 @@
 import csv
 import pandas as pd
+from datetime import datetime
 
 
 
@@ -119,13 +120,32 @@ def readfile(filename):
     return df
 
 
-def find_best_match():
+def three_yr_breaks(break_data):
     """
+    Takes in break data and filters out to breaks (install year) that occurred 2016-2019.
+    Returns filtered dataframe.
+    """
+    # convert DATE column from string to datetime
+    break_data['DATE'] = pd.to_datetime(break_data['DATE'], format='%m/%d/%Y')
+
+    # filters out dates before 2016 and after 2019
+    new_df = break_data[(break_data['DATE'] > '12/31/2015') & (break_data['DATE'] < '1/1/2020')]
+    
+    # normalize street name
+    # new_df['PROBLEM_ADDRESS'] = [remove_house_number(x) for x in new_df['PROBLEM_ADDRESS']]
+    print(new_df['PROBLEM_ADDRESS'])
+    # print(new_df.head())
+
+
+
+"""
+def find_best_match():
+    
     Takes in potential matches csv file, and compares pipe size.
     Returns best matching pipe information.
     -- Info needed from all data set: material, install year, surface type, slope, length
-    """
-
+    
+"""
 
 if __name__ == "__main__":
     #print(remove_house_number("724 14th AVE NE"))
@@ -134,5 +154,9 @@ if __name__ == "__main__":
     # search("696 16th Ave W", "seattle_data.csv", "INTRLO")
     # search_allbreak_kirk("Kirk_All.csv", "Kirk_Break.csv", "INSTYEAR", "FULL_STRNA", 
     #                       "Break_Year", "Location")
-    seattle_df = readfile("seattle_data.csv")
-    search("9619 24TH AVE NW", seattle_df, "INTRLO")
+    seattle_df = readfile("seattle_break_data.csv")
+    # search("9619 24TH AVE NW", seattle_df, "INTRLO")
+    # date_str = seattle_df["DATE"][0]
+    # time_date = datetime.strptime(date_str, '%m/%d/%Y')
+    # print(type(time_date))
+    three_yr_breaks(seattle_df)
