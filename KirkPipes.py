@@ -4,8 +4,8 @@ import pandas as pd
 
 
 
-def search_allbreak_kirk():
-    #searches for in kirk all pipe file for all matches from break file based on address
+def search_allbreak():
+    #searches for matches from break file based on address
 
     kirk_all = group_by_id(readfile("kirk_all.csv"))
     kirk_break = readfile("kirk_break.csv")
