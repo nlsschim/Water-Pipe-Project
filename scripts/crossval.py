@@ -3,9 +3,27 @@ import numpy as np
 from sklearn.metrics import balanced_accuracy_score, precision_score, recall_score
 
 
-def crossval_by_year(data, classifier_fn, n_val=2, print_results=True):
+def crossval_by_year(data, classifier_fn, params_dict, n_val=2, print_results=True):
+    '''
+    data:          the dataframe with all of the pipe break data
+    classifier_fn: the sklearn classifier that you want to use
+    params_dict:   a dictionary containing all of the parameters you want to use for your classifier
+
+    Example:
+
+    df = pd.read_csv('final_data.csv') 
+    params = {
+      'n_estimators': 150,
+      'max_depth': 5
+    } 
+    avg_acc = crossval_by_year(df, ExtraTreesClassifier, params)
+
+    returns a numpy array with [avg balanced accuracy, avg recall, avg precision]
+    '''
     # Get all available years contained in the input data
     data_years = list(data['Process_year'].unique())
+
+    assert(n_val < len(data_years))
 
     scores = []
     t_init = time.perf_counter()
@@ -27,6 +45,7 @@ def crossval_by_year(data, classifier_fn, n_val=2, print_results=True):
 
         # instantiate classifier
         classifier = classifier_fn()
+        classifier.set_params(**params_dict)
         # fit to training data
         classifier.fit(train_df.drop('Target', axis=1), train_df['Target'])
 
