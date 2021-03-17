@@ -1,3 +1,5 @@
 .DS_Store
 *.ipynb_checkpoints/
-*.vscode/settings.json
+*.vscode
+old-water-pipe-project/
+__pycache__
