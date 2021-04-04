@@ -1,6 +1,7 @@
 import time
 import numpy as np
 from sklearn.metrics import balanced_accuracy_score, precision_score, recall_score
+import random
 
 
 def crossval_by_year(data, classifier_fn, params_dict, n_val=2, print_results=True):
@@ -11,11 +12,11 @@ def crossval_by_year(data, classifier_fn, params_dict, n_val=2, print_results=Tr
 
     Example:
 
-    df = pd.read_csv('final_data.csv') 
+    df = pd.read_csv('final_data.csv')
     params = {
       'n_estimators': 150,
       'max_depth': 5
-    } 
+    }
     avg_acc = crossval_by_year(df, ExtraTreesClassifier, params)
 
     returns a numpy array with [avg balanced accuracy, avg recall, avg precision]
@@ -27,7 +28,7 @@ def crossval_by_year(data, classifier_fn, params_dict, n_val=2, print_results=Tr
 
     scores = []
     t_init = time.perf_counter()
-    
+
     for i in range(len(data_years)):
         # select window of years to use for evaluation
         val_years = data_years[i:i+n_val]
@@ -37,7 +38,7 @@ def crossval_by_year(data, classifier_fn, params_dict, n_val=2, print_results=Tr
                      .drop(['TARGET_FID', 'Process_year', 'Break_Yr'], axis=1) \
                      .dropna(axis=0) \
                      .astype(np.float32)
-        
+
         val_df = data[data['Process_year'].isin(val_years)] \
                      .drop(['TARGET_FID', 'Process_year', 'Break_Yr'], axis=1) \
                      .dropna(axis=0) \
@@ -67,7 +68,7 @@ def crossval_by_year(data, classifier_fn, params_dict, n_val=2, print_results=Tr
             print()
 
         scores.append((bal_acc, recall, precision))
-    
+
     avgs = np.array(scores).mean(axis=0)
 
     if (print_results):
@@ -77,3 +78,30 @@ def crossval_by_year(data, classifier_fn, params_dict, n_val=2, print_results=Tr
         print(f'Avg. Precision    = {avgs[2]:.4f}')
 
     return avgs
+
+
+def rand_param_search(data, param_list, classifier_fn, n_val=2, print_results=True, n_iter=5):
+    """
+    stuff goes here
+    """
+    best_score = -1.0
+    best_param = {}
+    param = {}
+    for i in range(n_iter):
+        
+        for key in param_list.keys():
+            val = random.choice(param_list[key])
+            param[key] = val
+        print("using the following parameters:")
+        print(param)
+        avgs = crossval_by_year(data, classifier_fn, param, n_val, print_results)
+        print(avgs[0])
+        print(avgs[1])
+        print(avgs[2])
+        print()
+
+    if avgs[2] > best_score:
+        best_param = param
+        best_score = avgs[2]
+
+    return best_param, best_score
