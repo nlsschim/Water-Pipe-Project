@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.metrics import balanced_accuracy_score, precision_score, recall_score
 
 
-def crossval_by_year(data, classifier_fn, params_dict, n_val=2, print_results=True):
+def crossval_by_year(data, classifier_fn, params_dict, n_val=2, threshold=0.5, print_results=True):
     '''
     data:          the dataframe with all of the pipe break data
     classifier_fn: the sklearn classifier that you want to use
@@ -52,7 +52,8 @@ def crossval_by_year(data, classifier_fn, params_dict, n_val=2, print_results=Tr
         # make predictions on evaluation dataset
         x_val = val_df.drop('Target', axis=1)
         y_val = val_df['Target']
-        preds = classifier.predict(x_val)
+        pred_prob = classifier.predict_proba(x_val)
+        preds = (pred_prob[:,1] >= threshold).astype(bool) 
 
         recall = recall_score(y_true=y_val, y_pred=preds)
         precision = precision_score(y_true=y_val, y_pred=preds)
