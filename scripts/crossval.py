@@ -35,12 +35,12 @@ def crossval_by_year(data, classifier_fn, params_dict, n_val=2, threshold=0.5, p
 
         # select relevant training and testing data, drop structural and/or invalid data
         train_df = data[~data['Process_year'].isin(val_years)] \
-                     .drop(['TARGET_FID', 'Process_year', 'Break_Yr'], axis=1) \
+                     .drop(['OBJECTID', 'Process_year', 'Break_Yr'], axis=1) \
                      .dropna(axis=0) \
                      .astype(np.float32)
         
         val_df = data[data['Process_year'].isin(val_years)] \
-                     .drop(['TARGET_FID', 'Process_year', 'Break_Yr'], axis=1) \
+                     .drop(['OBJECTID', 'Process_year', 'Break_Yr'], axis=1) \
                      .dropna(axis=0) \
                      .astype(np.float32)
 
@@ -70,9 +70,12 @@ def crossval_by_year(data, classifier_fn, params_dict, n_val=2, threshold=0.5, p
         recall = recall_score(y_true=y_val, y_pred=preds)
         precision = precision_score(y_true=y_val, y_pred=preds)
 
-        bal_acc = (recall+precision) / 2
+        bal_acc = balanced_accuracy_score(y_true=y_val, y_pred=preds)
 
         train_preds = classifier.predict(x_train)
+
+        train_recall = recall_score(y_train, train_preds)
+        train_precision = precision_score(y_train, train_preds)
 
         train_bal_acc = balanced_accuracy_score(y_train, train_preds)
 
@@ -83,6 +86,8 @@ def crossval_by_year(data, classifier_fn, params_dict, n_val=2, threshold=0.5, p
             print(f'Precision         = {precision:.4f}')
             print()
             print(f'Training set balanced accuracy = {train_bal_acc}')
+            print(f'Train Recall            = {train_recall:.4f}')
+            print(f'Train Precision         = {train_precision:.4f}')
             print()
 
         scores.append((bal_acc, recall, precision))
