@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 PACKAGES = find_packages()
 
 # Get version and release info, which is all stored in Water-Pipe-Project/version.py
-ver_file = os.path.join('diff_predictor', 'version.py')
+ver_file = os.path.join('water_main_predictions', 'version.py')
 with open(ver_file) as f:
     exec(f.read())
 
@@ -16,19 +16,19 @@ with open(ver_file) as f:
 # SETUP_REQUIRES += ['wheel'] if 'bdist_wheel' in sys.argv else []
 PACKAGES = find_packages()
 
-opts = dict(name=NAME,
-            maintainer=MAINTAINER,
-            maintainer_email=MAINTAINER_EMAIL,
-            description=DESCRIPTION,
-            long_description=LONG_DESCRIPTION,
-            url=URL,
-            download_url=DOWNLOAD_URL,
-            license=LICENSE,
+opts = dict(name='water_pipe_predictions',
+            maintainer='Nels Schimek',
+            maintainer_email='nlsschim@uw.edu',
+            description='Package for predicting pipe breaks',
+            long_description='Package to use a Random Forest Machine learning model to predict pipe breaks and determine most important features',
+            url='https://github.com/nlsschim/Water-Pipe-Project',
+            download_url='https://github.com/nlsschim/Water-Pipe-Project',
+            license='MIT',
             classifiers=CLASSIFIERS,
             author=AUTHOR,
             author_email=AUTHOR_EMAIL,
             platforms=PLATFORMS,
-            version=VERSION,
+            version='0.1.0',
             packages=PACKAGES,
             package_data=PACKAGE_DATA,
             python_requires=PYTHON_REQUIRES,

@@ -1,5 +1,7 @@
 import numpy as np
+from numpy.lib.function_base import angle
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def tree_feature_importance(tree_model, X_train):
     """
@@ -25,16 +27,19 @@ def tree_feature_importance(tree_model, X_train):
     # Print the feature ranking
     print("Feature ranking:")
     print()
+    ordered_features = []
     for f in range(X_train.shape[1]):
         #feature_name = features[indices[f]]
         print(f'{f + 1}. {features[indices[f]]}, {importances[indices[f]]}')
+        ordered_features.append(features[indices[f]])
         print()
 
     # Plot the impurity-based feature importances of the forest
-    plt.figure()
+    fig = plt.figure()
     plt.title("Feature importances")
     plt.bar(range(X_train.shape[1]), importances[indices],
             color="r", yerr=std[indices], align="center")
-    plt.xticks(range(X_train.shape[1]), indices)
+    plt.xticks(range(X_train.shape[1]), ordered_features, rotation=90)
     plt.xlim([-1, X_train.shape[1]])
     plt.show()
+    return fig

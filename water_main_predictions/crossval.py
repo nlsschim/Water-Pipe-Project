@@ -1,10 +1,13 @@
 import time
+from imblearn.over_sampling._smote.filter import SVMSMOTE
 import numpy as np
 from sklearn.metrics import balanced_accuracy_score, precision_score, recall_score
 from sklearn.preprocessing import StandardScaler
+from imblearn.over_sampling import SMOTE, ADASYN, BorderlineSMOTE, SVMSMOTE, KMeansSMOTE
+from imblearn.under_sampling import ClusterCentroids
 
 
-def crossval_by_year(data, classifier_fn, params_dict, n_val=2, threshold=0.5, print_results=True, normalize_data=False):
+def crossval_by_year(data, classifier_fn, params_dict, n_val=2, threshold=0.5, print_results=True, normalize_data=False, under_sample=False):
     '''
     data:          the dataframe with all of the pipe break data
     classifier_fn: the sklearn classifier that you want to use
@@ -50,6 +53,9 @@ def crossval_by_year(data, classifier_fn, params_dict, n_val=2, threshold=0.5, p
         # fit to training data
         x_train = train_df.drop('Target', axis=1)
         y_train = train_df['Target']
+
+        if under_sample:
+            x_train, y_train = ClusterCentroids().fit_resample(x_train, y_train)
 
         if normalize_data:
           scaler = StandardScaler()
@@ -185,3 +191,44 @@ def crossval_between_cities(train_df, val_df, classifier_fn, params_dict, n_val=
         print(f'Train Precision         = {train_precision:.4f}')
 
     return avgs
+
+# Used to build a list containing dictionaries w every compination of params
+# from param list, start with a list containing one dict (src), 
+# then call for each param (cross, keyword)
+def cross_params(src, cross, keyword):
+    combos = []
+    for d in src:
+        for val in cross:
+            cpy = d.copy()
+            cpy[keyword] = val
+            combos.append(cpy)
+    return combos
+
+# Uses cross_params to get list of all parameter combinations 
+def get_param_combos(param_list):
+    param_combos = [{}]
+    for kw in param_list:
+        param_combos = cross_params(param_combos, param_list[kw], kw)
+    return param_combos
+
+def rand_param_search(data, param_list, classifier_fn, n_val=2, threshold=0.1, print_results=True):
+    """
+
+    """
+    best_score = -1.0 
+    best_param = {}
+    param_combos = get_param_combos(param_list)
+    for param in param_combos:
+        print("using the following parameters:")
+        print(param)
+        avgs = crossval_by_year(data, classifier_fn, param, n_val, threshold, print_results, under_sample=True)
+        print(avgs[0])
+        print(avgs[1])
+        print(avgs[2])
+        print()
+        if avgs[0] > best_score:
+            best_param = param
+            best_score = avgs[0]
+    
+    
+    return best_param, best_score
