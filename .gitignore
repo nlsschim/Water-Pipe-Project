@@ -1,5 +1,2 @@
-.DS_Store
-*.ipynb_checkpoints/
-*.vscode
-old-water-pipe-project/
 __pycache__
+.DS_Store
